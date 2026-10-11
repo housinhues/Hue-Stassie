@@ -4,12 +4,12 @@ Internal dashboard: project tracker, workload chart, calendar, and social feed l
 
 ## Hosting
 
-This Vite dashboard is deployed to **GitHub Pages** from the `main` branch. Every push to `main` triggers the workflow in [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which installs dependencies, runs the type-check and production build, and publishes `dist/`.
+This Vite dashboard is deployed to **Vercel** at the domain root. A GitHub Pages workflow is also kept for an optional repository-site deployment; when that workflow runs, it builds with the `/hue-stassie/` project path automatically.
 
 The expected public URL is:
 
 ```text
-https://housinhues.github.io/Hue-Stassie/
+https://huestasie.vercel.app/
 ```
 
 The dashboard stores its current workspace in browser `localStorage`, so it is usable in local-only mode. When Supabase is configured, the workstation adds magic-link login and cloud persistence.
@@ -30,4 +30,4 @@ The app intentionally remains usable without Supabase. In local-only mode, the c
 
 ## Deployment configuration
 
-The GitHub Actions workflow only needs the optional Supabase variables when cloud mode is ready. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository Actions secrets, then push to `main`. GitHub Pages must be configured to use **GitHub Actions** as its source.
+The GitHub Actions workflow only needs the optional Supabase variables when cloud mode is ready. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository Actions secrets, then push to `main`. To use the optional GitHub Pages deployment, enable Pages for the repository and select **GitHub Actions** as its source.
