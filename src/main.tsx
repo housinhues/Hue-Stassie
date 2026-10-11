@@ -85,8 +85,6 @@ function App() {
     return () => { cancelled = true; unsubscribe(); };
   }, []);
 
-  if (!authReady) return <AccessScreen title="Checking your secure workspace…" detail="Verifying your Housing Hues session." />;
-  if (isCloudConfigured() && !session) return <LoginScreen />;
 
   async function syncFromCloud() {
     try {
@@ -126,6 +124,8 @@ function App() {
 
   const scopedProjects = useMemo(() => projects.filter((project) => project.owner === identity || identity === 'Housing Hues'), [projects, identity]);
   const stats = useMemo(() => ({ active: scopedProjects.filter((p) => p.status === 'active').length, blocked: scopedProjects.filter((p) => p.status === 'blocked').length, load: scopedProjects.reduce((sum, p) => sum + p.load, 0) }), [scopedProjects]);
+  if (!authReady) return <AccessScreen title="Checking your secure workspace…" detail="Verifying your Housing Hues session." />;
+  if (isCloudConfigured() && !session) return <LoginScreen />;
   const currentIdentity = identities.find((item) => item.name === identity) || identities[0];
 
   const addProject = () => {
