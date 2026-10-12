@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Analytics } from '@vercel/analytics/react';
 import './styles.css';
 import {
   isCloudConfigured, getSession, onAuthChange, signInWithEmail, signOut,
@@ -151,7 +152,9 @@ function App() {
     setToast('Content approved — publishing is still gated');
   };
 
-  return <div className="app-shell" data-theme={theme} style={{ '--identity': currentIdentity.color } as React.CSSProperties}>
+  return <>
+    <Analytics />
+    <div className="app-shell" data-theme={theme} style={{ '--identity': currentIdentity.color } as React.CSSProperties}>
     <aside className="sidebar">
       <div className="brand"><div className="brand-symbol">⌬</div><div><strong>hues<span>tasie</span></strong><small>HOUSING HUES WORKSTATION</small></div></div>
       <div className="workspace-label">PRIVATE OFFICE <span>●</span></div>
@@ -171,7 +174,8 @@ function App() {
     {agentOpen && <Agent onClose={() => setAgentOpen(false)} onToast={setToast} />}
     {composerOpen && <Composer identity={identity} onClose={() => setComposerOpen(false)} onSave={(item) => { setContent((items) => [item, ...items]); setComposerOpen(false); setModule('content'); setToast('Draft saved to content studio'); if (session) upsertContentItem(toCloudContent(item)); }} />}
     {toast && <div className="toast">✓ {toast}</div>}
-  </div>;
+  </div>
+  </>;
 }
 
 function AccessScreen({ title, detail }: { title: string; detail: string }) {
