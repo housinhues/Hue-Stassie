@@ -42,13 +42,16 @@ export function onAuthChange(callback: (session: Session | null) => void) {
   return () => data.subscription.unsubscribe();
 }
 
-export async function signInWithEmail(email: string) {
+// The PIN is the account password in Supabase Auth. Use 8+ digits for real protection.
+export async function signInWithPin(email: string, pin: string) {
   if (!supabase) throw new Error('Cloud sync is not configured yet.');
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabase.auth.signInWithPassword({
     email: email.trim(),
-    options: { emailRedirectTo: window.location.href },
+    password: pin,
   });
-  if (error) throw error;
+  if (error) {
+    throw new Error(error.message === 'Invalid login credentials' ? 'Wrong email or PIN.' : error.message);
+  }
 }
 
 export async function signOut() {

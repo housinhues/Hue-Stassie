@@ -12,7 +12,7 @@ The expected public URL is:
 https://huestasie.vercel.app/
 ```
 
-The dashboard stores its current workspace in browser `localStorage`, so it is usable in local-only mode. When Supabase is configured, the workstation adds magic-link login and cloud persistence.
+The dashboard stores its current workspace in browser `localStorage`, so it is usable in local-only mode. When Supabase is configured, the workstation adds email + PIN login (the PIN is the Supabase Auth password; use 8+ digits) and cloud persistence. Create users in the Supabase dashboard (Authentication → Users) and turn off public sign-ups.
 
 ## Local preview
 

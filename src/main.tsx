@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
 import './styles.css';
 import {
-  isCloudConfigured, getSession, onAuthChange, signInWithEmail, signOut,
+  isCloudConfigured, getSession, onAuthChange, signInWithPin, signOut,
   fetchProjects, upsertProject, fetchContent, upsertContentItem,
   type CloudProject, type CloudContentItem,
 } from './cloudSync';
@@ -113,14 +113,7 @@ function App() {
       return;
     }
     if (session) { await signOut(); setToast('Signed out of cloud sync'); return; }
-    const email = window.prompt('Enter your Housing Hues email to receive a secure sign-in link:');
-    if (!email) return;
-    try {
-      await signInWithEmail(email);
-      setToast('Check your email for the sign-in link');
-    } catch (error) {
-      alert(`Could not send sign-in link: ${(error as Error).message}`);
-    }
+    setToast('Sign in with your email and PIN on the login screen');
   }
 
   const scopedProjects = useMemo(() => projects.filter((project) => project.owner === identity || identity === 'Housing Hues'), [projects, identity]);
@@ -184,25 +177,26 @@ function AccessScreen({ title, detail }: { title: string; detail: string }) {
 
 function LoginScreen() {
   const [email, setEmail] = useState('');
+  const [pin, setPin] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !pin) return;
     setBusy(true);
     setMessage('');
     try {
-      await signInWithEmail(email);
-      setMessage('Check your email for the secure sign-in link.');
+      await signInWithPin(email, pin);
     } catch (error) {
-      setMessage(`Sign-in failed: ${(error as Error).message}`);
+      setMessage((error as Error).message);
+      setPin('');
     } finally {
       setBusy(false);
     }
   }
 
-  return <div className="access-screen"><form className="access-card login-card" onSubmit={submit}><div className="brand-symbol">⌬</div><p className="eyebrow">HUESTASIE · PRIVATE OFFICE</p><h1>Sign in to Housing Hues.</h1><p>Your workstation is private. We will email you a secure, one-time sign-in link.</p><label htmlFor="login-email">Housing Hues email</label><input id="login-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@housinghues.co.za" autoComplete="email" required /><button className="primary-button" type="submit" disabled={busy}>{busy ? 'Sending…' : 'Send secure link'}</button>{message && <p className="login-message" role="status">{message}</p>}</form></div>;
+  return <div className="access-screen"><form className="access-card login-card" onSubmit={submit}><div className="brand-symbol">⌬</div><p className="eyebrow">HUESTASIE · PRIVATE OFFICE</p><h1>Sign in to Housing Hues.</h1><p>Your workstation is private. Enter your email and PIN.</p><label htmlFor="login-email">Housing Hues email</label><input id="login-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@housinghues.co.za" autoComplete="email" required /><label htmlFor="login-pin">PIN</label><input id="login-pin" type="password" inputMode="numeric" value={pin} onChange={(event) => setPin(event.target.value.replace(/\D/g, ''))} placeholder="••••••••" autoComplete="current-password" required /><button className="primary-button" type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>{message && <p className="login-message" role="status">{message}</p>}</form></div>;
 }
 
 function Overview({ stats, content, projects, onOpenContent, onAgent }: { stats: { active: number; blocked: number; load: number }; content: ContentItem[]; projects: Project[]; onOpenContent: () => void; onAgent: () => void }) { return <>
