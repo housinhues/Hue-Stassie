@@ -91,3 +91,9 @@ export async function upsertContentItem(item: CloudContentItem) {
   const { error } = await supabase.from('content_items').upsert(item, { onConflict: 'id' });
   if (error) console.warn('[Hue Stasie] upsertContentItem failed:', error.message);
 }
+
+export async function deleteContentItem(id: string) {
+  if (!supabase) return;
+  const { error } = await supabase.from('content_items').delete().eq('id', id);
+  if (error) console.warn('[Hue Stasie] deleteContentItem failed:', error.message);
+}
