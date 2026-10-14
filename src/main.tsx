@@ -28,7 +28,6 @@ const identities = [
   { name: 'Housing Hues', mark: 'H', color: '#c5ed63', instagram: 'https://www.instagram.com/housinghues', facebook: 'https://www.facebook.com/HousingHues' },
   { name: 'ntate.mongale', mark: 'N', color: '#55d8e9', instagram: 'https://www.instagram.com/ntate.mongale', facebook: 'https://www.facebook.com/ntate.mongale' },
   { name: '018 Productions', mark: '0', color: '#ff6b5c', instagram: 'https://www.instagram.com/018productions', facebook: '' },
-  { name: 'Vuks', mark: 'V', color: '#b695ff', instagram: '', facebook: '' },
 ];
 const seedProjects: Project[] = [
   { id: 'p1', name: 'True Organics', owner: 'Housing Hues', status: 'blocked', priority: 'urgent', next: 'Resolve website delay', notes: '', load: 25, subtasks: [{ id: 's1', text: 'Resolve website delay', done: false }, { id: 's2', text: 'Send exit threat response', done: false }] },
