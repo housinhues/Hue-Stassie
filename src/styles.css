@@ -11,4 +11,6 @@
 .tag.changes-requested{color:var(--coral);border-color:var(--coral)}
 .card-actions{flex-wrap:wrap}.danger-button{margin-left:auto;color:var(--coral)}
 .composer input{background:transparent;border:1px solid var(--line);color:inherit;border-radius:6px;padding:10px;font-size:12px}
+[data-status=waiting]{background:#e8b84a;box-shadow:0 0 8px rgba(232,184,74,.45)}[data-status=live]{background:var(--sage)}[data-status=archived]{background:var(--muted);opacity:.6}
+.field-line{display:grid;gap:5px;font-size:9px;letter-spacing:1px;color:var(--muted);margin:10px 0}.field-line input{background:transparent;border:1px solid var(--line);color:var(--text,inherit);border-radius:6px;padding:8px 10px;font-size:12px;letter-spacing:0}
 
