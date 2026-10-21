@@ -68,10 +68,18 @@ export async function fetchProjects(): Promise<CloudProject[]> {
   return data ?? [];
 }
 
-export async function upsertProject(project: CloudProject) {
-  if (!supabase) return;
+export async function upsertProject(project: CloudProject): Promise<boolean> {
+  if (!supabase) return false;
   const { error } = await supabase.from('projects').upsert(project, { onConflict: 'id' });
-  if (error) console.warn('[Hue Stasie] upsertProject failed:', error.message);
+  if (error) { console.warn('[Hue Stasie] upsertProject failed:', error.message); return false; }
+  return true;
+}
+
+export async function deleteProjectRemote(id: string): Promise<boolean> {
+  if (!supabase) return false;
+  const { error } = await supabase.from('projects').delete().eq('id', id);
+  if (error) { console.warn('[Hue Stasie] deleteProject failed:', error.message); return false; }
+  return true;
 }
 
 export async function fetchContent(): Promise<CloudContentItem[]> {
@@ -86,14 +94,40 @@ export async function fetchContent(): Promise<CloudContentItem[]> {
   return data ?? [];
 }
 
-export async function upsertContentItem(item: CloudContentItem) {
-  if (!supabase) return;
+export async function upsertContentItem(item: CloudContentItem): Promise<boolean> {
+  if (!supabase) return false;
   const { error } = await supabase.from('content_items').upsert(item, { onConflict: 'id' });
-  if (error) console.warn('[Hue Stasie] upsertContentItem failed:', error.message);
+  if (error) { console.warn('[Hue Stasie] upsertContentItem failed:', error.message); return false; }
+  return true;
 }
 
-export async function deleteContentItem(id: string) {
-  if (!supabase) return;
+export async function deleteContentItem(id: string): Promise<boolean> {
+  if (!supabase) return false;
   const { error } = await supabase.from('content_items').delete().eq('id', id);
-  if (error) console.warn('[Hue Stasie] deleteContentItem failed:', error.message);
+  if (error) { console.warn('[Hue Stasie] deleteContentItem failed:', error.message); return false; }
+  return true;
 }
+
+export type CloudSubtask = { id: string; project_id: string; text: string; done: boolean };
+
+// Returns null when the subtasks table is unreachable so callers can fall back to local data.
+export async function fetchSubtasks(): Promise<CloudSubtask[] | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase.from('subtasks').select('id, project_id, text, done');
+  if (error) { console.warn('[Hue Stasie] fetchSubtasks failed:', error.message); return null; }
+  return data ?? [];
+}
+
+export async function syncProjectSubtasks(projectId: string, subtasks: { id: string; text: string; done: boolean }[]): Promise<boolean> {
+  if (!supabase) return false;
+  const keep = subtasks.map((t) => t.id);
+  const del = keep.length
+    ? await supabase.from('subtasks').delete().eq('project_id', projectId).not('id', 'in', `(${keep.map((id) => `"${id}"`).join(',')})`)
+    : await supabase.from('subtasks').delete().eq('project_id', projectId);
+  if (del.error) { console.warn('[Hue Stasie] subtask cleanup failed:', del.error.message); return false; }
+  if (!subtasks.length) return true;
+  const { error } = await supabase.from('subtasks').upsert(subtasks.map((t) => ({ id: t.id, project_id: projectId, text: t.text, done: t.done })), { onConflict: 'id' });
+  if (error) { console.warn('[Hue Stasie] subtask upsert failed:', error.message); return false; }
+  return true;
+}
+
